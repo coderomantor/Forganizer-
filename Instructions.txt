@@ -1,0 +1,26 @@
+___________________Forganizer
+_______________________A file organizer
+___________________________By Roman Ullah
+
+You can separate these files:
+    1. programming files
+    2. Image files
+    3. Video files
+    4. Document files
+    5. Audio files
+    Note email us if you want any other file separation.
+	coderomantor@gmail.com
+
+Requirements:
+1.Python installed
+2.Vs-code installed
+
+Instructions:
+1. Run VS-code as administrator
+2. Open the Folder of the provided Forganizer's files inside Vs-code
+3. Run the make_key.py file inside Vs-code
+4. Enjoy Forganizer from the context menu by right click
+
+Recommendations:
+1. Never change the location of these files of Forganizer otherwise Forganizer will not work correctly.
+2. Email us for feedback and suggestions:- coderomantor@gmail.com 
