@@ -1,5 +1,6 @@
 import os
-import shutil as s
+import shutil
+from pathlib import Path
 
 dict_files = {
     'audio_files': (
@@ -37,30 +38,58 @@ dict_files = {
     'programming_files': (
     ".py", ".pyw", ".pyc", ".pyo", ".pyd",
     ".js", ".mjs", ".cjs", ".jsx", ".ts", ".tsx", ".java", ".class", ".jar", ".jad", ".jsp",
-    ".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".ino", ".cs",".cs", ".csx",
+    ".c", ".h", ".cpp", ".hpp", ".cc", ".cxx", ".ino", ".cs", ".csx",
     ".html", ".htm", ".xhtml", ".css", ".scss", ".sass", ".less",
     ".php", ".php3", ".php4", ".php5", ".phtml",".rb", ".rbw", ".rhtml",
     ".pl", ".pm", ".t", ".pod", ".psgi", ".sh", ".bash", ".bsh", ".csh", ".ksh", ".zsh", ".bat", ".cmd",".ps1", ".psm1", ".psd1",
-    ".swift",  ".kt", ".kts", ".ts", ".tsx", ".go", ".rs", ".rlib", ".lua", ".r", ".rdata", ".rds",
+    ".swift",  ".kt", ".kts", ".go", ".rs", ".rlib", ".lua", ".r", ".rdata", ".rds",
     ".scala", ".sc",".groovy", ".gvy", ".gy", ".gsh",".hs", ".lhs",".m",".jl",
-    ".m", ".mm", ".h",".sql", ".pls", ".plsql", ".db2",".asm", ".s", ".a51", ".inc",".vb", ".vbs", ".bas", ".frm", ".cls", ".ctl", ".vbhtml",
-    ".pas", ".pp", ".inc", ".dart",".yml", ".yaml", ".json", ".toml")
+    ".mm", ".sql", ".pls", ".plsql", ".db2",".asm", ".s", ".a51", ".inc",".vb", ".vbs", ".bas", ".frm", ".cls", ".ctl", ".vbhtml",
+    ".pas", ".pp", ".dart",".yml", ".yaml", ".json", ".toml")
 }
 
-folder_path = os.getcwd()
+def get_unique_path(destination_path):
+    """Returns a unique file path by appending a counter if the file already exists."""
+    if not destination_path.exists():
+        return destination_path
+    
+    counter = 1
+    while True:
+        new_name = f"{destination_path.stem}_{counter}{destination_path.suffix}"
+        new_path = destination_path.with_name(new_name)
+        if not new_path.exists():
+            return new_path
+        counter += 1
+
 def file_finder(path, file_extensions):
-    return [file for file in os.listdir(path) for extension in file_extensions if file.endswith(extension)]
+    """Finds files (not directories) with matching case-insensitive extensions."""
+    path_obj = Path(path)
+    matching_files = []
+    
+    # Pre-calculate lowercase extensions for faster matching
+    extensions_lower = {ext.lower() for ext in file_extensions}
+    
+    for item in path_obj.iterdir():
+        if item.is_file() and item.suffix.lower() in extensions_lower:
+            matching_files.append(item)
+            
+    return matching_files
+
 def organize_files():
+    folder_path = Path.cwd()
+    
     for extension_type, extension_tuple in dict_files.items():
         files = file_finder(folder_path, extension_tuple)
         
         if files:
-            folder_name = extension_type.split("_")[0] + " files"
-            folder_path_full = os.path.join(folder_path, folder_name)
-            os.makedirs(folder_path_full, exist_ok=True)
+            # Create a nice folder name, e.g., "audio_files" -> "Audio Files"
+            folder_name = extension_type.replace("_", " ").title()
+            folder_path_full = folder_path / folder_name
+            folder_path_full.mkdir(exist_ok=True)
+            
             for item in files:
-                item_path = os.path.join(folder_path, item)
-                item_new_path = os.path.join(folder_path_full, item)
-                s.move(item_path, item_new_path)
+                item_new_path = get_unique_path(folder_path_full / item.name)
+                shutil.move(str(item), str(item_new_path))
 
-organize_files()
+if __name__ == "__main__":
+    organize_files()
